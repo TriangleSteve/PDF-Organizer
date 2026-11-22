@@ -1,4 +1,4 @@
-# Private PDF Organizer
+# Pagecraft — Private PDF Organizer
 
 A static, client-side PDF page organizer. Add several PDFs, select source pages, arrange them in a horizontal filmstrip, and download a new PDF. **Your PDFs are not uploaded to any server.**
 
@@ -55,3 +55,7 @@ The Vite `base: './'` setting makes the site work at repository project paths wi
 - Very large PDFs can use substantial browser memory during thumbnail generation or export.
 - Clearing browser memory/reloading the page loses the session; there is no server persistence.
 - PDF content is not uploaded; GitHub Pages only hosts the app's code.
+
+## Version 1.1 UI changes
+
+Removed the application header and redundant helper copy, moved the output filename and Generate PDF button into the Output document heading, and added a local SVG favicon. PDF processing behavior remains unchanged.

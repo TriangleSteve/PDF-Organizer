@@ -304,7 +304,6 @@ function renderOutput() {
   strip.replaceChildren();
   $('output-empty').hidden = output.length > 0;
   $('output-count').textContent = `${output.length} ${output.length === 1 ? 'page' : 'pages'}`;
-  $('export-summary').textContent = output.length ? `${output.length} ${output.length === 1 ? 'page' : 'pages'} · ${new Set(output.map((p) => p.fileId)).size} source ${new Set(output.map((p) => p.fileId)).size === 1 ? 'file' : 'files'}` : 'Add pages to get started';
   $('undo').disabled = !history.length || generating;
   $('redo').disabled = !future.length || generating;
   $('clear-output').disabled = !output.length || generating;
