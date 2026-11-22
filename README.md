@@ -1,61 +1,62 @@
-# Pagecraft — Private PDF Organizer
+# PDF Organizer
 
-A static, client-side PDF page organizer. Add several PDFs, select source pages, arrange them in a horizontal filmstrip, and download a new PDF. **Your PDFs are not uploaded to any server.**
+A lightweight static site for rearranging pages from multiple PDF files. All PDF
+processing runs client-side. No backend, Vite, Node.js, npm, or build step.
+
+## One-time setup to bundle the libraries locally
+
+Run **once** in the project directory (Python 3 with Internet access is required):
+
+```sh
+python3 scripts/download_libraries.py
+```
+
+This downloads four version-pinned JavaScript assets into `vendor/`. Commit the
+`vendor/` files to GitHub with the rest of the site. Once those files are present,
+**all application dependencies load locally**, even with no external CDN access.
+
+**Important:** The four libraries are NOT already present in this ZIP: the
+packaging environment could not reach their servers. To make the source ZIP
+usable before the one-time step, the site falls back to their version-pinned
+CDN URLs if a local asset is missing. The PDF contents themselves are never
+sent to any server.
+
+## GitHub Pages deployment without Actions
+
+1. Upload all files to your repository's root (including `src/`, `vendor/`, and `favicon.svg`).
+2. Run the vendor downloader above on your computer and commit the four new files.
+3. Remove the old `.github/workflows/deploy.yml` and other Vite files from the
+   existing GitHub repository (`package.json`, `package-lock.json`, `vite.config.js`).
+4. In **Settings → Pages → Build and deployment**, select **Deploy from a branch**.
+5. Select **main**, folder **/(root)**, and Save.
+6. The site will be available at `https://<username>.github.io/<repository>/`.
+
+No build or workflow is necessary. Relative paths work inside GitHub Pages project sites.
 
 ## Run locally
 
-Requirements: Node.js 22+ and npm.
+Use any simple HTTP server, for example:
 
-```bash
-npm install
-npm run dev
+```sh
+python3 -m http.server 8000
 ```
 
-Open the localhost URL printed by Vite. For a production preview:
-
-```bash
-npm run build
-npm run preview
-```
-
-## Deploy to GitHub Pages
-
-1. Create a **new GitHub repository** (public, or private with GitHub Pages available on your plan).
-2. Copy the **contents** of this directory to the root of the repository, including `.github/workflows/deploy.yml`.
-3. Optionally run `npm install` locally and commit the generated `package-lock.json` for fully reproducible dependency resolution. The included workflow also works without a lockfile.
-4. Commit and push everything to the repository's `main` branch.
-5. In repository **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions**.
-6. Wait for the `Deploy to GitHub Pages` workflow to finish, then open the URL shown in **Settings → Pages**.
-
-The Vite `base: './'` setting makes the site work at repository project paths without changing configuration.
+Open http://localhost:8000/. Avoid opening `index.html` as a `file://` URL: browser
+security rules can block JavaScript modules, PDF.js workers, and PDF file loading.
 
 ## Features
 
-- Add multiple files, including via drag-and-drop
-- Scrollable source-file list, thumbnail preview grid, full-size page preview
-- Click, shift-click, select-all, and clear source selection
-- Add selected pages to the start or end of the output
-- Reuse any source page more than once
-- Horizontal output filmstrip; drag to reorder or remove pages individually
-- Undo/redo for output changes (buttons and keyboard shortcuts)
-- Name and download the generated PDF
-- Local PDF processing; no backend, credentials, analytics, or CDN runtime dependencies
+- Add multiple PDFs or drag PDFs onto the app
+- Select pages, including ranges, and add them to the beginning or end
+- Preview source and output pages
+- Drag to reorder output pages
+- Undo/redo output arrangement
+- Remove source files; their output pages and undo history references are removed
+- Generate a PDF with the chosen filename and page order
 
-## Dependencies
+## Limitations
 
-- `pdfjs-dist` — read and render thumbnail previews
-- `pdf-lib` — copy original page content into the exported PDF
-- `sortablejs` — drag and drop ordering
-- `vite` — static build and dev server
-
-## Known limitations
-
-- Encrypted/password-protected PDF files aren't supported in v1.
-- Digital signatures, bookmarks, attachments and complex document-level features may not survive page extraction. The app is intended for visual PDF pages, not specialized PDF editing.
-- Very large PDFs can use substantial browser memory during thumbnail generation or export.
-- Clearing browser memory/reloading the page loses the session; there is no server persistence.
-- PDF content is not uploaded; GitHub Pages only hosts the app's code.
-
-## Version 1.1 UI changes
-
-Removed the application header and redundant helper copy, moved the output filename and Generate PDF button into the Output document heading, and added a local SVG favicon. PDF processing behavior remains unchanged.
+- Password-protected/encrypted files aren't supported.
+- Signed PDFs and complex form/document metadata may not survive extraction.
+- Large PDFs can consume substantial browser memory.
+- Refreshing the page clears the session.

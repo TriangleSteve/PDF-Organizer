@@ -6,7 +6,8 @@
     <meta name="theme-color" content="#0b1020" />
     <meta name="description" content="Combine and reorder pages from PDF files without uploading them to a server." />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <title>Pagecraft — PDF Organizer</title>
+    <link rel="stylesheet" href="./src/style.css" />
+    <title>PDF Organizer</title>
   </head>
   <body>
     <div id="app">
@@ -42,6 +43,6 @@
       <div id="drop-overlay" hidden><div class="drop-inner"><div class="drop-symbol">＋</div><strong>Drop PDFs to add them</strong><span>Files are processed locally in your browser</span></div></div>
       <dialog id="preview-dialog" class="preview-dialog" aria-label="Page preview"><div class="dialog-bar"><span id="preview-title">Page preview</span><button type="button" id="close-preview" aria-label="Close preview">✕</button></div><div class="preview-image-wrap" id="preview-content"></div></dialog>
     </div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

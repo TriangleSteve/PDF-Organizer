@@ -1,10 +1,41 @@
-import './style.css';
-import * as pdfjsLib from 'pdfjs-dist';
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-import { PDFDocument } from 'pdf-lib';
-import Sortable from 'sortablejs';
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+// All dependencies are loaded from local files when available.
+// Online CDN fallback keeps the unbuilt site usable until libraries are vendored.
+async function tryImport(local, remote) {
+  try { return { module: await import(local), local: true }; }
+  catch (error) {
+    console.warn(`Local library not available (${local}); using pinned CDN fallback.`, error);
+    return { module: await import(remote), local: false };
+  }
+}
+function loadGlobal(local, remote, globalName) {
+  return new Promise((resolve, reject) => {
+    function inject(url, fallback) {
+      const script = document.createElement('script');
+      script.src = url;
+      script.onload = () => {
+        if (window[globalName]) resolve(window[globalName]);
+        else if (fallback) inject(remote, false);
+        else reject(new Error(`${globalName} was not initialized.`));
+      };
+      script.onerror = () => {
+        script.remove();
+        if (fallback) inject(remote, false);
+        else reject(new Error(`Could not load ${globalName}.`));
+      };
+      document.head.append(script);
+    }
+    inject(local, true);
+  });
+}
+const [{ module: pdfjsLib, local: localPdfJs }, PDFLib, Sortable] = await Promise.all([
+  tryImport('./../vendor/pdf.min.mjs', 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.min.mjs'),
+  loadGlobal('./vendor/pdf-lib.min.js', 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js', 'PDFLib'),
+  loadGlobal('./vendor/Sortable.min.js', 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js', 'Sortable')
+]);
+const { PDFDocument } = PDFLib;
+pdfjsLib.GlobalWorkerOptions.workerSrc = localPdfJs
+  ? new URL('../vendor/pdf.worker.min.mjs', import.meta.url).href
+  : 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.worker.min.mjs';
 
 const $ = (id) => document.getElementById(id);
 const files = new Map();
@@ -89,7 +120,8 @@ function renderFiles() {
     remove.textContent = '×';
     remove.title = `Remove ${file.name}`;
     remove.setAttribute('aria-label', `Remove ${file.name}`);
-    remove.addEventListener('click', (event) => { event.stopPropagation(); removeFile(file.id); });
+    remove.addEventListener('pointerdown', (event) => event.stopPropagation());
+    remove.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); removeFile(file.id); });
     el.append(icon, info, remove);
     el.addEventListener('click', () => activateFile(file.id));
     el.addEventListener('keydown', (event) => {
@@ -106,16 +138,31 @@ function removeFile(fileId) {
   if (!file || generating) return;
   const affected = output.filter((page) => page.fileId === fileId).length;
   if (affected && !window.confirm(`Remove "${file.name}"? This also removes ${affected} page(s) from your output.`)) return;
-  if (affected) updateOutput(output.filter((page) => page.fileId !== fileId));
-  file.pdf.destroy().catch(() => {});
+
+  // Remove the source before rendering dependent UI. A removed PDF must not
+  // remain reachable through undo/redo snapshots.
   files.delete(fileId);
+  const withoutFile = (pages) => pages.filter((page) => page.fileId !== fileId);
+  const nextOutput = withoutFile(output);
+  history = history.map(withoutFile);
+  future = future.map(withoutFile);
+  if (affected) future = [];
+  output = nextOutput;
+
   if (activeId === fileId) {
     activeId = files.keys().next().value ?? null;
     selected.clear();
     lastSelected = null;
-    renderPages();
   }
   renderFiles();
+  renderPages();
+  renderOutput();
+
+  // Destroy after detaching references, so PDF.js cleanup cannot interrupt UI.
+  Promise.resolve().then(() => file.pdf.destroy()).catch((error) => {
+    console.warn('PDF cleanup failed:', error);
+  });
+  toast(`Removed ${file.name}.`);
 }
 
 async function addFiles(fileList) {
