@@ -94,6 +94,7 @@ function renderFiles() {
   const list = $('file-list');
   list.replaceChildren();
   $('source-empty').hidden = files.size > 0;
+  list.hidden = files.size === 0;
   $('file-count').textContent = String(files.size);
   for (const file of files.values()) {
     const el = document.createElement('div');
@@ -263,6 +264,7 @@ function renderPages() {
   grid.replaceChildren();
   const file = files.get(activeId);
   $('pages-empty').hidden = !!file;
+  grid.hidden = !file;
   $('pages-toolbar').hidden = !file;
   $('pages-actions').hidden = !file;
   $('active-file-name').textContent = file ? file.name : 'Select a PDF to browse';

@@ -1,62 +1,56 @@
 # PDF Organizer 
 
-A lightweight static site for rearranging pages from multiple PDF files. All PDF
-processing runs client-side. No backend, Vite, Node.js, npm, or build step.
+A lightweight, browser-based tool for combining and rearranging pages from multiple PDF files. PDF contents are processed on your device, with no backend or file-upload service. The app is a plain static site that can be hosted directly on GitHub Pages; it does not require Vite, Node.js, npm, or a build step.
 
-## One-time setup to bundle the libraries locally
+## Features
 
-Run **once** in the project directory (Python 3 with Internet access is required):
+- Add multiple PDF documents using the file picker or drag and drop.
+- Browse source documents with page thumbnails and full-page previews.
+- Select individual pages, select all, or Shift-click to select a range.
+- Add selected pages to the beginning or end of the output document.
+- Drag pages to reorder the horizontally scrolling output strip.
+- Remove individual output pages or remove a source document and its associated pages.
+- Undo or redo changes to the output arrangement.
+- Choose an output filename, generate a merged PDF, and download it.
+- Process PDFs entirely in the browser, without sending their contents to a server.
 
-```sh
-python3 scripts/download_libraries.py
-```
+## Limitations
 
-This downloads four version-pinned JavaScript assets into `vendor/`. Commit the
-`vendor/` files to GitHub with the rest of the site. Once those files are present,
-**all application dependencies load locally**, even with no external CDN access.
-
-**Important:** The four libraries are NOT already present in this ZIP: the
-packaging environment could not reach their servers. To make the source ZIP
-usable before the one-time step, the site falls back to their version-pinned
-CDN URLs if a local asset is missing. The PDF contents themselves are never
-sent to any server.
-
-## GitHub Pages deployment without Actions
-
-1. Upload all files to your repository's root (including `src/`, `vendor/`, and `favicon.svg`).
-2. Run the vendor downloader above on your computer and commit the four new files.
-3. Remove the old `.github/workflows/deploy.yml` and other Vite files from the
-   existing GitHub repository (`package.json`, `package-lock.json`, `vite.config.js`).
-4. In **Settings → Pages → Build and deployment**, select **Deploy from a branch**.
-5. Select **main**, folder **/(root)**, and Save.
-6. The site will be available at `https://<username>.github.io/<repository>/`.
-
-No build or workflow is necessary. Relative paths work inside GitHub Pages project sites.
+- Password-protected or encrypted PDFs are not supported.
+- Digital signatures, complex interactive forms, bookmarks, and certain document-level metadata may not survive page extraction.
+- Large documents can use substantial browser memory and may take longer to render or export.
+- There is no saved workspace: refreshing the page resets the current session.
+- This app rearranges existing pages; it does not edit text or graphics within a page.
 
 ## Run locally
 
-Use any simple HTTP server, for example:
+Serve the project directory using any basic HTTP server. For example, with Python 3:
 
 ```sh
 python3 -m http.server 8000
 ```
 
-Open http://localhost:8000/. Avoid opening `index.html` as a `file://` URL: browser
-security rules can block JavaScript modules, PDF.js workers, and PDF file loading.
+Open http://localhost:8000/ in your browser. Avoid opening `index.html` directly as a `file://` URL: browser security restrictions can interfere with JavaScript modules and PDF.js workers.
 
-## Features
+### One-time setup: local JavaScript libraries
 
-- Add multiple PDFs or drag PDFs onto the app
-- Select pages, including ranges, and add them to the beginning or end
-- Preview source and output pages
-- Drag to reorder output pages
-- Undo/redo output arrangement
-- Remove source files; their output pages and undo history references are removed
-- Generate a PDF with the chosen filename and page order
+The app uses version-pinned copies of PDF.js, pdf-lib, and SortableJS in `vendor/`. If these files are missing, run this once with Python 3 and an internet connection:
 
-## Limitations
+```sh
+python3 scripts/download_libraries.py
+```
 
-- Password-protected/encrypted files aren't supported.
-- Signed PDFs and complex form/document metadata may not survive extraction.
-- Large PDFs can consume substantial browser memory.
-- Refreshing the page clears the session.
+Commit the resulting four library files alongside the site. Once present, PDF Organizer loads its dependencies locally; no external CDN is required at runtime. If the files are absent, the app attempts to load pinned CDN copies as a fallback. **PDF contents are not sent to those CDNs.**
+
+### Deploy on GitHub Pages
+
+1. Commit `index.html`, `src/`, `favicon.svg`, and the populated `vendor/` directory to the repository root.
+2. In the repository, select **Settings → Pages → Build and deployment**.
+3. Set **Source** to **Deploy from a branch**, choose **main** and **/(root)**, then save.
+4. Visit `https://<username>.github.io/<repository>/` after Pages finishes publishing.
+
+No build command or GitHub Actions deployment workflow is needed. If you previously used Vite, remove its obsolete config, package files, and deployment workflow.
+
+## Created in collaboration with AI
+
+PDF Organizer was developed through a human–AI collaboration. The project's requirements, usability goals, design direction, and iterations were guided by its creator, with AI assistance used to develop and refine the implementation and documentation. The result is open to inspection and modification like any other static web project.

@@ -13,3 +13,13 @@
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:1100px){.output-heading-right{flex-wrap:wrap;gap:8px 14px}.output-tools{margin-right:auto}}
 @media(max-width:650px){.workspace{height:auto;min-height:100vh}.output-heading{padding:14px 16px}.output-heading-right{width:100%;flex:1 0 100%;justify-content:space-between}.output-tools{width:100%}.output-heading .export-file{flex:1 1 145px;width:auto}.generate{padding:10px 12px}.output-strip-wrap{padding:0 16px 12px}.output-empty{inset:3px 16px 12px}}
+
+/* v1.3: documentation link and centered empty panels */
+.pages-heading{align-items:center}
+.pages-heading-right{display:flex;align-items:center;gap:18px;margin-left:auto}
+.docs-link{display:inline-flex;align-items:center;gap:8px;color:#a7b5d0;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap;border-radius:6px;padding:6px 0}
+.docs-link:hover{color:#e9edff}
+.docs-link:focus-visible{outline:2px solid #8e93ff;outline-offset:3px}
+.source-empty{flex:1;min-height:0;justify-content:center;padding:16px 4px}
+.pages-empty{flex:1;min-height:0;justify-content:center}
+@media(max-width:650px){.pages-heading-right{gap:8px}.docs-link{font-size:11px;gap:5px}.docs-link svg{width:15px;height:15px}.pages-heading{align-items:center}}
