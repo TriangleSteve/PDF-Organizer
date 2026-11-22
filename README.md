@@ -1,4 +1,4 @@
-# PDF Organizer
+# PDF Organizer 
 
 A lightweight static site for rearranging pages from multiple PDF files. All PDF
 processing runs client-side. No backend, Vite, Node.js, npm, or build step.
