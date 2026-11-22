@@ -1,0 +1,19 @@
+{
+  "name": "pagecraft-pdf-organizer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "6.5.438",
+    "sortablejs": "1.15.7"
+  },
+  "devDependencies": {
+    "vite": "^7.1.12"
+  }
+}
